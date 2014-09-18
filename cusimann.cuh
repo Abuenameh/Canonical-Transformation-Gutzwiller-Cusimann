@@ -39,7 +39,6 @@
 #include <stdlib.h>
 #include <cuda.h>
 #include <curand_kernel.h>
-//#include <cutil_inline.h>
 #include <helper_cuda.h>
 #include <math.h>
 #include <time.h>

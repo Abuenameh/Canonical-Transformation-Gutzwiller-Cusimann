@@ -10,8 +10,11 @@
 #include "cusimann.cuh"
 #include "nelderMead.h"
 #include "gutzwiller.hpp"
-//#include "energy.cuh"
 
+double f_nelderMead(unsigned int n, const double *x, double *grad,
+		void *f_data) {
+	return Energy<double>()(x, n, f_data);
+}
 
 int main(int argc, char** argv) {
 	time_t start = time(NULL);
