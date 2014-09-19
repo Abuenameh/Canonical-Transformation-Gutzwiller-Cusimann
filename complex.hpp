@@ -20,13 +20,13 @@
 template<class T>
 struct complextype {
 	typedef T type;
-	static inline type make_complex(T a, T b);
+	__host__ __device__ static inline type make_complex(T a, T b);
 };
 
 template<>
 struct complextype<float> {
 	typedef singlecomplex type;
-	static inline type make_complex(float a, float b) {
+	__host__ __device__ static inline type make_complex(float a, float b) {
 		return make_singlecomplex(a, b);
 	}
 };
@@ -34,7 +34,7 @@ struct complextype<float> {
 template<>
 struct complextype<double> {
 	typedef doublecomplex type;
-	static inline type make_complex(double a, double b) {
+	__host__ __device__ static inline type make_complex(double a, double b) {
 		return make_doublecomplex(a, b);
 	}
 };
