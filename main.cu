@@ -92,6 +92,8 @@ int main(int argc, char** argv) {
 	parameters<double> parms;
 	parms.U = U;
 	parms.J = J;
+	parms.mu = 0.5;
+	parms.theta = theta;
 		parms.f = new complex<double>[L*dim];
 
 	double f_nelderMead_minimum;

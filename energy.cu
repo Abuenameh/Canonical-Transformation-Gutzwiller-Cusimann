@@ -10,6 +10,8 @@
 #include "gutzwiller.hpp"
 #include "cuda_complex.hpp"
 
+#define h(i, n) complex<T>(x[2*(i*dim+n)], x[2*(i*dim+n)+1])
+
 template<class T>
 __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 	void *f_data) const {
@@ -30,6 +32,8 @@ __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 //	real costh = parms->costh;
 //	real sinth = parms->sinth;
 
+	int q = blockDim.x;
+
 	complex<T> expth = exp(complex<T>(0, 1) * theta);
 	complex<T> expmth = ~expth;
 	complex<T> exp2th = expth * expth;
@@ -39,6 +43,11 @@ __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 	T Er = 0;
 	T Eri[L];
 
+	const complex<T>* ff = reinterpret_cast<const complex<T>*>(x);
+	const complex<T>* ffi[L];
+	for(int i = 0; i < L; i++) {
+		ffi[i] = ff;//+i*dim;//&ff[i*dim];
+	}
 	const complex<T> * f[L];
 	T norm2[L];
 	complex<T> f2[dim];
@@ -125,8 +134,11 @@ __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 //        	complex<T> sdf = ~asd*asd;
 //        	complex<T> wer = ~f[i][n]*f[i][n];
 //            E0 = ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~f[i][n] * f[i][n];
-//            E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~f2[n] * f2[n];
-            E0 = ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~f[i][n] * f[i][n];
+//            E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~ffi[i][n] * ffi[i][n];
+//            E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~ff[(i*dim+n)] * ff[(i*dim+n)];
+//            E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~complex<T>(x[2*(i*dim+n)],x[2*(i*dim+n)+1]) * complex<T>(x[2*(i*dim+n)],x[2*(i*dim+n)+1]);
+//            E0 = ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~f[i][n] * f[i][n];
+                        E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~h(i,n) * h(i,n);
 
             if (n < nmax) {
 //            	complex_t qwe = -J[j1]*expth*g(n,n+1)*f[i][n+1];//*~f[j1][n]*f[i][n]*f[j1][n+1];
