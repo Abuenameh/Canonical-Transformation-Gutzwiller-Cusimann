@@ -61,10 +61,15 @@ __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
             E0 += (0.5 * U[i] * n * (n - 1) - mu * n) * ~f[i][n] * f[i][n];
 
             if (n < nmax) {
-                E1j1 += -J[j1] * expth * g(n, n + 1) * ~f[i][n + 1] * ~f[j1][n]
-                        * f[i][n] * f[j1][n + 1];
-                E1j2 += -J[i] * expmth * g(n, n + 1) * ~f[i][n + 1] * ~f[j2][n] * f[i][n]
-                        * f[j2][n + 1];
+//            	complex_t qwe = -J[j1]*expth*g(n,n+1)*f[i][n+1];//*~f[j1][n]*f[i][n]*f[j1][n+1];
+//            	E1j1 += qwe;
+            	E1j1 += -J[j1]*expth*g(n,n+1)*f[i][n+1];
+//            	E1j1 += -J[j1]*expth*g(n,n+1);
+//            	E1j1 += expth*f[i][n+1];
+//                E1j1 += -J[j1] * expth * g(n, n + 1) * ~f[i][n + 1] * ~f[j1][n]
+//                        * f[i][n] * f[j1][n + 1];
+//                E1j2 += -J[i] * expmth * g(n, n + 1) * ~f[i][n + 1] * ~f[j2][n] * f[i][n]
+//                        * f[j2][n + 1];
 
             }
 
