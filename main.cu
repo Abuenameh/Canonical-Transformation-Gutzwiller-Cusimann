@@ -19,7 +19,7 @@ double f_nelderMead(unsigned int n, const double *x, double *grad,
 int main(int argc, char** argv) {
 	time_t start = time(NULL);
 
-	real T_0 = 1000, T_min = 0.01;
+	real T_0 = 1000, T_min = 0.1;
 	const unsigned int n = 2 * L * dim, N = 10;
 	const real rho = 0.99;
 	size_t sizeFD = n * sizeof(real);
