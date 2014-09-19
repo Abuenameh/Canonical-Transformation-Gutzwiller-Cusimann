@@ -54,8 +54,8 @@ int main(int argc, char** argv) {
 	checkCudaErrors(cudaMemcpy(d_U, U, L*sizeof(real), cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc(&d_J, L*sizeof(real)));
 	checkCudaErrors(cudaMemcpy(d_J, J, L*sizeof(real), cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc(&d_f, L*sizeof(complex<real>)));
-	checkCudaErrors(cudaMemcpy(d_J, J, L*sizeof(complex<real>), cudaMemcpyHostToDevice));
+//	checkCudaErrors(cudaMalloc(&d_f, L*sizeof(complex<real>)));
+//	checkCudaErrors(cudaMemcpy(d_J, J, L*sizeof(complex<real>), cudaMemcpyHostToDevice));
 
 	real theta = 0;
 
