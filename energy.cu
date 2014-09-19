@@ -11,9 +11,10 @@
 #include "cuda_complex.hpp"
 
 #define h(i, n) complex<T>(x[2*(i*dim+n)], x[2*(i*dim+n)+1])
+#define f(i, n) complex<T>(x[2*(i*dim+n)], x[2*(i*dim+n)+1])
 
 template<class T>
-__host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
+__host__  __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 	void *f_data) const {
 
 	parameters<T>* parms = (parameters<T>*) f_data;
@@ -40,28 +41,26 @@ __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 	complex<T> expm2th = ~exp2th;
 
 	complex<T> E = 0;
-	T Er = 0;
-	T Eri[L];
 
-	const complex<T>* ff = reinterpret_cast<const complex<T>*>(x);
-	const complex<T>* ffi[L];
-	for(int i = 0; i < L; i++) {
-		ffi[i] = ff;//+i*dim;//&ff[i*dim];
-	}
-	const complex<T> * f[L];
+//	const complex<T>* ff = reinterpret_cast<const complex<T>*>(x);
+//	const complex<T>* ffi[L];
+//	for(int i = 0; i < L; i++) {
+//		ffi[i] = ff;//+i*dim;//&ff[i*dim];
+//	}
+//	const complex<T> * f[L];
 	T norm2[L];
-	complex<T> f2[dim];
-	for (int n = 0; n <= nmax; n++) {
-		f2[n] = complex<T>(x[2*n],x[2*n+1]);
-	}
+//	complex<T> f2[dim];
+//	for (int n = 0; n <= nmax; n++) {
+//		f2[n] = complex<T>(x[2*n],x[2*n+1]);
+//	}
 	for (int i = 0; i < L; i++) {
-		f[i] = reinterpret_cast<const complex<T>*>(&x[2 * i * dim]);
+//		f[i] = reinterpret_cast<const complex<T>*>(&x[2 * i * dim]);
 //		f[i] = f2;
 		norm2[i] = 0;
 		for (int n = 0; n <= nmax; n++) {
-			norm2[i] += norm(f[i][n]);
+			norm2[i] += norm(h(i,n)); //norm(f[i][n]);
+			}
 		}
-	}
 
 //	typedef typename complextype<T>::type complex_t;
 //
@@ -118,71 +117,120 @@ __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 //		complex_t E5j2k2 = complex_t::zero();
 
 		complex<T> Eg;
-        for (int n = 0; n <= nmax; n++) {
-////        	E0 += f[i][n];
-//        	            complex<T> Ee = /*((T)0.5 * U[i] * n * (n - 1) - mu * n) */ ~f[i][n] * ~f[i][n];
-//        	            complex<T> Ef = Ee;///*((T)0.5 * U[i] * n * (n - 1) - mu * n) */ ~f[i][n] * ~f[i][n];
-//        	            Eg += Ee;
-//        	printf("%d %d\n", i, n);
-//        	complex<T> asd = f[i][n];
-//        	const complex<T>* poi = f[0];
-//        	const complex<T>* lkj = f[i];
-//        	complex<T> oiu = poi[n];
-//        	complex<T> kjh = lkj[n];
-//        	complex<T> mnb = f[i][n];
-//        	complex<T> zxc = f[L-1][nmax];
-//        	complex<T> sdf = ~asd*asd;
-//        	complex<T> wer = ~f[i][n]*f[i][n];
-//            E0 = ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~f[i][n] * f[i][n];
-//            E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~ffi[i][n] * ffi[i][n];
-//            E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~ff[(i*dim+n)] * ff[(i*dim+n)];
-//            E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~complex<T>(x[2*(i*dim+n)],x[2*(i*dim+n)+1]) * complex<T>(x[2*(i*dim+n)],x[2*(i*dim+n)+1]);
-//            E0 = ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~f[i][n] * f[i][n];
-                        E0 += ((T)0.5 * U[i] * n * (n - 1) - mu * n) * ~h(i,n) * h(i,n);
+		for (int n = 0; n <= nmax; n++) {
+			E0 += ((T) 0.5 * U[i] * n * (n - 1) - mu * n) * ~f(i,n)* f(i,n);
 
-            if (n < nmax) {
-//            	complex_t qwe = -J[j1]*expth*g(n,n+1)*f[i][n+1];//*~f[j1][n]*f[i][n]*f[j1][n+1];
-//            	E1j1 += qwe;
-//            	E1j1 += -J[j1]*expth*g(n,n+1)*f[i][n+1];
-//            	E1j1 += -J[j1]*expth*g(n,n+1);
-//            	E1j1 += expth*f[i][n+1];
-                E1j1 += -J[j1] * expth * g<T>(n, n + 1) * ~h(i,n + 1) * ~h(j1,n)
-                        * h(i,n) * h(j1,n + 1);
-                E1j2 += -J[i] * expmth * g<T>(n, n + 1) * ~h(i,n + 1) * ~h(j2,n) * h(i,n)
-                        * h(j2,n + 1);
+			if (n < nmax) {
+				E1j1 += -J[j1] * expth * g<T>(n, n + 1) * ~f(i,n + 1) * ~f(j1,n)
+				* f(i,n) * f(j1,n + 1);
+				E1j2 += -J[i] * expmth * g<T>(n, n + 1) * ~f(i,n + 1) * ~f(j2,n)* f(i,n)
+                        * f(j2,n + 1);
             }
 
+            if (n > 0) {
+                E2j1 += (T)0.5 * J[j1] * J[j1] * exp2th * g<T>(n, n) * g<T>(n - 1, n + 1)
+                        * ~f(i,n + 1) * ~f(j1,n - 1) * f(i,n - 1) * f(j1,n + 1)
+                        * (1 / eps<T>(U, i, j1, n, n) - 1 / eps<T>(U, i, j1, n - 1, n + 1));
+                E2j2 += (T)0.5 * J[i] * J[i] * expm2th * g<T>(n, n) * g<T>(n - 1, n + 1)
+                        * ~f(i,n + 1) * ~f(j2,n - 1) * f(i,n - 1) * f(j2,n + 1)
+                        * (1 / eps<T>(U, i, j2, n, n) - 1 / eps<T>(U, i, j2, n - 1, n + 1));
+            }
+
+            for (int m = 1; m <= nmax; m++) {
+                if (n != m - 1) {
+                    E3j1 += (T)0.5 * (J[j1] * J[j1] / eps<T>(U, i, j1, n, m)) * g<T>(n, m)
+                            * g<T>(m - 1, n + 1)
+                            * (~f(i,n + 1) * ~f(j1,m - 1) * f(i,n + 1) * f(j1,m - 1)
+                            - ~f(i,n) * ~f(j1,m) * f(i,n) * f(j1,m));
+                    E3j2 += (T)0.5 * (J[i] * J[i] / eps<T>(U, i, j2, n, m)) * g<T>(n, m)
+                            * g<T>(m - 1, n + 1)
+                            * (~f(i,n + 1) * ~f(j2,m - 1) * f(i,n + 1) * f(j2,m - 1)
+                            - ~f(i,n) * ~f(j2,m) * f(i,n) * f(j2,m));
+                }
+            }
+
+            if (n > 0) {
+                E4j1j2 += (T)0.5 * (J[j1] * J[i] / eps<T>(U, i, j1, n, n)) * g<T>(n, n)
+                        * g<T>(n - 1, n + 1) * ~f(i,n + 1) * ~f(j1,n - 1) * ~f(j2,n)
+                        * f(i,n - 1) * f(j1,n) * f(j2,n + 1);
+                E4j1j2 += (T)0.5 * (J[i] * J[j1] / eps<T>(U, i, j2, n, n)) * g<T>(n, n)
+                        * g<T>(n - 1, n + 1) * ~f(i,n + 1) * ~f(j2,n - 1) * ~f(j1,n)
+                        * f(i,n - 1) * f(j2,n) * f(j1,n + 1);
+                E4j1k1 += (T)0.5 * (J[j1] * J[k1] / eps<T>(U, i, j1, n, n)) * g<T>(n, n)
+                        * g<T>(n - 1, n + 1) * ~f(i,n + 1) * ~f(j1,n - 1) * ~f(k1,n)
+                        * f(i,n) * f(j1,n + 1) * f(k1,n - 1);
+                E4j2k2 += (T)0.5 * (J[i] * J[j2] / eps<T>(U, i, j2, n, n)) * g<T>(n, n)
+                        * g<T>(n - 1, n + 1) * ~f(i,n + 1) * ~f(j2,n - 1) * ~f(k2,n)
+                        * f(i,n) * f(j2,n + 1) * f(k2,n - 1);
+                E4j1j2 -= (T)0.5 * (J[j1] * J[i] / eps<T>(U, i, j1, n - 1, n + 1))
+                        * g<T>(n, n) * g<T>(n - 1, n + 1) * ~f(i,n + 1) * ~f(j1,n)
+                        * ~f(j2,n - 1) * f(i,n - 1) * f(j1,n + 1) * f(j2,n);
+                E4j1j2 -= (T)0.5 * (J[i] * J[j1] / eps<T>(U, i, j2, n - 1, n + 1))
+                        * g<T>(n, n) * g<T>(n - 1, n + 1) * ~f(i,n + 1) * ~f(j2,n)
+                        * ~f(j1,n - 1) * f(i,n - 1) * f(j2,n + 1) * f(j1,n);
+                E4j1k1 -= (T)0.5 * (J[j1] * J[k1] / eps<T>(U, i, j1, n - 1, n + 1))
+                        * g<T>(n, n) * g<T>(n - 1, n + 1) * ~f(i,n) * ~f(j1,n - 1)
+                        * ~f(k1,n + 1) * f(i,n - 1) * f(j1,n + 1) * f(k1,n);
+                E4j2k2 -= (T)0.5 * (J[i] * J[j2] / eps<T>(U, i, j2, n - 1, n + 1))
+                        * g<T>(n, n) * g<T>(n - 1, n + 1) * ~f(i,n) * ~f(j2,n - 1)
+                        * ~f(k2,n + 1) * f(i,n - 1) * f(j2,n + 1) * f(k2,n);
+            }
+
+            for (int m = 1; m <= nmax; m++) {
+                if (n != m - 1 && n < nmax) {
+                    E5j1j2 += (T)0.5 * (J[j1] * J[i] * exp2th / eps<T>(U, i, j1, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n + 1) * ~f(j1,m - 1)
+                            * ~f(j2,m) * f(i,n + 1) * f(j1,m) * f(j2,m - 1);
+                    E5j1j2 += (T)0.5 * (J[i] * J[j1] * expm2th / eps<T>(U, i, j2, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n + 1) * ~f(j2,m - 1)
+                            * ~f(j1,m) * f(i,n + 1) * f(j2,m) * f(j1,m - 1);
+                    E5j1k1 += (T)0.5 * (J[j1] * J[k1] * exp2th / eps<T>(U, i, j1, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n + 1) * ~f(j1,m - 1)
+                            * ~f(k1,n) * f(i,n) * f(j1,m - 1) * f(k1,n + 1);
+                    E5j2k2 += (T)0.5 * (J[i] * J[j2] * expm2th / eps<T>(U, i, j2, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n + 1) * ~f(j2,m - 1)
+                            * ~f(k2,n) * f(i,n) * f(j2,m - 1) * f(k2,n + 1);
+                    E5j1j2 -= (T)0.5 * (J[j1] * J[i] * exp2th / eps<T>(U, i, j1, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n) * ~f(j1,m - 1)
+                            * ~f(j2,m) * f(i,n) * f(j1,m) * f(j2,m - 1);
+                    E5j1j2 -= (T)0.5 * (J[i] * J[j1] * expm2th / eps<T>(U, i, j2, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n) * ~f(j2,m - 1)
+                            * ~f(j1,m) * f(i,n) * f(j2,m) * f(j1,m - 1);
+                    E5j1k1 -= (T)0.5 * (J[j1] * J[k1] * exp2th / eps<T>(U, i, j1, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n + 1) * ~f(j1,m)
+                            * ~f(k1,n) * f(i,n) * f(j1,m) * f(k1,n + 1);
+                    E5j2k2 -= (T)0.5 * (J[i] * J[j2] * expm2th / eps<T>(U, i, j2, n, m))
+                            * g<T>(n, m) * g<T>(m - 1, n + 1) * ~f(i,n + 1) * ~f(j2,m)
+                            * ~f(k2,n) * f(i,n) * f(j2,m) * f(k2,n + 1);
+                }
+            }
         }
 
 		E += E0 / norm2[i];
-//		Eri[i] = E0.real() / norm2[i] + E1j1.real() / (norm2[i] * norm2[j1]) + E1j2.real() / (norm2[i] * norm2[j2]);
 
 		E += E1j1 / (norm2[i] * norm2[j1]);
 		E += E1j2 / (norm2[i] * norm2[j2]);
-//				Er += E1j1.real() / (norm2[i] * norm2[j1]);
-//				Er += E1j2.real() / (norm2[i] * norm2[j2]);
 
-//		E += E2j1 / (norm2[i] * norm2[j1]);
-//		E += E2j2 / (norm2[i] * norm2[j2]);
-//
-//		E += E3j1 / (norm2[i] * norm2[j1]);
-//		E += E3j2 / (norm2[i] * norm2[j2]);
-//
-//		E += E4j1j2 / (norm2[i] * norm2[j1] * norm2[j2]);
-//		E += E4j1k1 / (norm2[i] * norm2[j1] * norm2[k1]);
-//		E += E4j2k2 / (norm2[i] * norm2[j2] * norm2[k2]);
-//
-//		E += E5j1j2 / (norm2[i] * norm2[j1] * norm2[j2]);
-//		E += E5j1k1 / (norm2[i] * norm2[j1] * norm2[k1]);
-//		E += E5j2k2 / (norm2[i] * norm2[j2] * norm2[k2]);
+		E += E2j1 / (norm2[i] * norm2[j1]);
+		E += E2j2 / (norm2[i] * norm2[j2]);
+
+		E += E3j1 / (norm2[i] * norm2[j1]);
+		E += E3j2 / (norm2[i] * norm2[j2]);
+
+		E += E4j1j2 / (norm2[i] * norm2[j1] * norm2[j2]);
+		E += E4j1k1 / (norm2[i] * norm2[j1] * norm2[k1]);
+		E += E4j2k2 / (norm2[i] * norm2[j2] * norm2[k2]);
+
+		E += E5j1j2 / (norm2[i] * norm2[j1] * norm2[j2]);
+		E += E5j1k1 / (norm2[i] * norm2[j1] * norm2[k1]);
+		E += E5j2k2 / (norm2[i] * norm2[j2] * norm2[k2]);
 	}
-//    printf("Here\n");
 
 	return E.real();
-//	return Eri[0];
-//	return 0;
 }
 
-template class Energy<float> ;
-template class Energy<double> ;
+template class Energy<float>
+;
+template class Energy<double>
+;
 

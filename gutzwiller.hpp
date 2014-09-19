@@ -24,7 +24,8 @@ __host__ __device__ inline T g(int n, int m) {
 	return sqrt((T)1.0*(n + 1) * m);
 }
 
-__host__ __device__ inline double eps(real* U, int i, int j, int n, int m) {
+template<class T>
+__host__ __device__ inline T eps(T* U, int i, int j, int n, int m) {
 	return n * U[i] - (m - 1) * U[j];
 }
 
