@@ -52,19 +52,15 @@ int main(int argc, char** argv) {
 	parameters<real>* d_parms;
 	real* d_U;
 	real* d_J;
-	complex<real>* d_f;
 	checkCudaErrors(cudaMalloc(&d_U, L*sizeof(real)));
 	checkCudaErrors(cudaMemcpy(d_U, h_d_U, L*sizeof(real), cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc(&d_J, L*sizeof(real)));
 	checkCudaErrors(cudaMemcpy(d_J, h_d_J, L*sizeof(real), cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMalloc(&d_f, L*sizeof(complex<real>)));
-//	checkCudaErrors(cudaMemcpy(d_f, h_d_f, L*sizeof(complex<real>), cudaMemcpyHostToDevice));
 
 	real theta = 0;
 
 	h_d_parms.U = d_U;
 	h_d_parms.J = d_J;
-	h_d_parms.f = d_f;
 	h_d_parms.mu = 0.5;
 	h_d_parms.theta = theta;
 	h_d_parms.costh = cos(theta);
@@ -85,16 +81,11 @@ int main(int argc, char** argv) {
 	printf(" ]\n");
 	printf("f(cusimann_minimum) = %lf\n", f_cusimann_minimum);
 
-//	parms.U = U;
-//	parms.J = J;
-//	parms.f = new complex<double>[L*dim];
-
 	parameters<double> parms;
 	parms.U = U;
 	parms.J = J;
 	parms.mu = 0.5;
 	parms.theta = theta;
-		parms.f = new complex<double>[L*dim];
 
 	double f_nelderMead_minimum;
 	double *nelderMead_minimum = (double*) malloc(n * sizeof(double));
@@ -106,8 +97,6 @@ int main(int argc, char** argv) {
 		printf(" %f", nelderMead_minimum[i]);
 	printf(" ]\n");
 	printf("f(nelderMead_minimum) = %lf\n", f_nelderMead_minimum);
-
-	delete[] parms.f;
 
 	free(lb);
 	free(ub);

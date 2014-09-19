@@ -11,7 +11,7 @@
 #include "cuda_complex.hpp"
 #include "configuration.h"
 
-#define L 5
+#define L 10
 #define nmax 5
 #define dim (nmax+1)
 
@@ -35,7 +35,6 @@ struct parameters {
 	T* J;
 	T mu;
     T theta;
-    complex<T>* f;
     real costh;
     real sinth;
     real cos2th;
