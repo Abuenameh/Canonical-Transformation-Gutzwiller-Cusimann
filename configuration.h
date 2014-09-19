@@ -1,8 +1,8 @@
-/* Copyright (c) 2011-2012 University of A Coruña
+/* Copyright (c) 2011-2012 University of A Coruï¿½a
  *
  * CUSIMANN: An optimized simulated annealing software for GPUs
  *
- * Authors: A.M. Ferreiro, J.A. García, J.G. López-Salas, C. Vázquez 
+ * Authors: A.M. Ferreiro, J.A. Garcï¿½a, J.G. Lï¿½pez-Salas, C. Vï¿½zquez 
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
