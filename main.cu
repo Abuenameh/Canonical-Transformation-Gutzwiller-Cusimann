@@ -36,41 +36,44 @@ int main(int argc, char** argv) {
 	unsigned int n_threads_per_block = 128;//512;//256;
 	unsigned int n_blocks = 64;
 
-	real U[L], J[L];
+	double U[L], J[L];
 	for (int i = 0; i < L; i++) {
 		U[i] = 1;
 		J[i] = 0.001;
 	}
-	parameters<real> parms;
-	parms.U = U;
-	parms.J = J;
-	parms.mu = 0.5;
 
+	real h_d_U[L], h_d_J[L];
+	for (int i = 0; i < L; i++) {
+		h_d_U[i] = (real)U[i];
+		h_d_J[i] = (real)J[i];
+	}
+
+	parameters<real> h_d_parms;
 	parameters<real>* d_parms;
 	real* d_U;
 	real* d_J;
 	complex<real>* d_f;
 	checkCudaErrors(cudaMalloc(&d_U, L*sizeof(real)));
-	checkCudaErrors(cudaMemcpy(d_U, U, L*sizeof(real), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(d_U, h_d_U, L*sizeof(real), cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMalloc(&d_J, L*sizeof(real)));
-	checkCudaErrors(cudaMemcpy(d_J, J, L*sizeof(real), cudaMemcpyHostToDevice));
-//	checkCudaErrors(cudaMalloc(&d_f, L*sizeof(complex<real>)));
-//	checkCudaErrors(cudaMemcpy(d_J, J, L*sizeof(complex<real>), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(d_J, h_d_J, L*sizeof(real), cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMalloc(&d_f, L*sizeof(complex<real>)));
+//	checkCudaErrors(cudaMemcpy(d_f, h_d_f, L*sizeof(complex<real>), cudaMemcpyHostToDevice));
 
 	real theta = 0;
 
-	parms.U = d_U;
-	parms.J = d_J;
-	parms.f = d_f;
-	parms.mu = 0.5;
-	parms.theta = theta;
-	parms.costh = cos(theta);
-	parms.sinth = sin(theta);
-	parms.cos2th = cos(2*theta);
-	parms.sin2th = sin(2*theta);
+	h_d_parms.U = d_U;
+	h_d_parms.J = d_J;
+	h_d_parms.f = d_f;
+	h_d_parms.mu = 0.5;
+	h_d_parms.theta = theta;
+	h_d_parms.costh = cos(theta);
+	h_d_parms.sinth = sin(theta);
+	h_d_parms.cos2th = cos(2*theta);
+	h_d_parms.sin2th = sin(2*theta);
 	checkCudaErrors(cudaMalloc(&d_parms, sizeof(parameters<real>)));
 	checkCudaErrors(
-			cudaMemcpy(d_parms, &parms, sizeof(parameters<real>),
+			cudaMemcpy(d_parms, &h_d_parms, sizeof(parameters<real>),
 					cudaMemcpyHostToDevice));
 
 	cusimann_optimize(n_threads_per_block, n_blocks, T_0, T_min, N, rho, n, lb,
@@ -82,9 +85,14 @@ int main(int argc, char** argv) {
 	printf(" ]\n");
 	printf("f(cusimann_minimum) = %lf\n", f_cusimann_minimum);
 
+//	parms.U = U;
+//	parms.J = J;
+//	parms.f = new complex<double>[L*dim];
+
+	parameters<double> parms;
 	parms.U = U;
 	parms.J = J;
-//	parms.f = new complex<double>[L*dim];
+		parms.f = new complex<double>[L*dim];
 
 	double f_nelderMead_minimum;
 	double *nelderMead_minimum = (double*) malloc(n * sizeof(double));
