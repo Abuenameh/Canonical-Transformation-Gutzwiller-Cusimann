@@ -19,23 +19,33 @@ __host__ __device__ inline int mod(int i) {
 	return (i + L) % L;
 }
 
-__host__ __device__ inline real g(int n, int m) {
-	return sqrt(1.0*(n + 1) * m);
+template<class T>
+__host__ __device__ inline T g(int n, int m) {
+	return sqrt((T)1.0*(n + 1) * m);
 }
 
 __host__ __device__ inline double eps(real* U, int i, int j, int n, int m) {
 	return n * U[i] - (m - 1) * U[j];
 }
 
+template<class T>
 struct parameters {
-	real* U;
-	real mu;
-	real* J;
-    real theta;
+	T* U;
+	T* J;
+	T mu;
+    T theta;
     real costh;
     real sinth;
     real cos2th;
     real sin2th;
+//	real* U;
+//	real mu;
+//	real* J;
+//    real theta;
+//    real costh;
+//    real sinth;
+//    real cos2th;
+//    real sin2th;
 };
 
 template<class T>

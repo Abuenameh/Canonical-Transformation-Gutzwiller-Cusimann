@@ -41,12 +41,12 @@ int main(int argc, char** argv) {
 		U[i] = 1;
 		J[i] = 0.001;
 	}
-	parameters parms;
+	parameters<real> parms;
 	parms.U = U;
 	parms.J = J;
 	parms.mu = 0.5;
 
-	parameters* d_parms;
+	parameters<real>* d_parms;
 	real* d_U;
 	real* d_J;
 	checkCudaErrors(cudaMalloc(&d_U, L*sizeof(real)));
@@ -64,9 +64,9 @@ int main(int argc, char** argv) {
 	parms.sinth = sin(theta);
 	parms.cos2th = cos(2*theta);
 	parms.sin2th = sin(2*theta);
-	checkCudaErrors(cudaMalloc(&d_parms, sizeof(parameters)));
+	checkCudaErrors(cudaMalloc(&d_parms, sizeof(parameters<real>)));
 	checkCudaErrors(
-			cudaMemcpy(d_parms, &parms, sizeof(parameters),
+			cudaMemcpy(d_parms, &parms, sizeof(parameters<real>),
 					cudaMemcpyHostToDevice));
 
 	cusimann_optimize(n_threads_per_block, n_blocks, T_0, T_min, N, rho, n, lb,
