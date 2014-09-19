@@ -146,10 +146,10 @@ __host__ __device__ T Energy<T>::operator ()(const T *x, unsigned int n,
 //            	E1j1 += -J[j1]*expth*g(n,n+1)*f[i][n+1];
 //            	E1j1 += -J[j1]*expth*g(n,n+1);
 //            	E1j1 += expth*f[i][n+1];
-//                E1j1 += -J[j1] * expth * g<T>(n, n + 1) * ~f[i][n + 1] * ~f[j1][n]
-//                        * f[i][n] * f[j1][n + 1];
-//                E1j2 += -J[i] * expmth * g<T>(n, n + 1) * ~f[i][n + 1] * ~f[j2][n] * f[i][n]
-//                        * f[j2][n + 1];
+                E1j1 += -J[j1] * expth * g<T>(n, n + 1) * ~h(i,n + 1) * ~h(j1,n)
+                        * h(i,n) * h(j1,n + 1);
+                E1j2 += -J[i] * expmth * g<T>(n, n + 1) * ~h(i,n + 1) * ~h(j2,n) * h(i,n)
+                        * h(j2,n + 1);
             }
 
         }
