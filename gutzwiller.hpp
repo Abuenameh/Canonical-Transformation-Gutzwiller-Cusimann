@@ -8,7 +8,7 @@
 #ifndef GUTZWILLER_HPP_
 #define GUTZWILLER_HPP_
 
-#include "complex.hpp"
+#include "cuda_complex.hpp"
 #include "configuration.h"
 
 #define L 5
@@ -34,6 +34,7 @@ struct parameters {
 	T* J;
 	T mu;
     T theta;
+    complex<T>* f;
     real costh;
     real sinth;
     real cos2th;
